@@ -1,0 +1,44 @@
+version: "3.3"
+services:
+   database:
+           image: mysql
+           container_name: bd_wordpress
+           restart: always
+           environment:
+               MYSQL_ROOT_PASSWORD: mysql1234
+               MYSQL_DATABASE: db_wordpress
+               MYSQL_USER: user_wordpress
+               MYSQL_PASSWORD: Test@2024
+           volumes:
+               - bd-data:/var/lib/mysql
+   wordpress:
+           image: wordpress
+           container_name: wordpress
+           restart: always
+           environment:
+               WORDPRESS_DB_HOST: database
+               WORDPRESS_DB_USER: user_wordpress
+               WORDPRESS_DB_PASSWORD: Test@2024
+               WORDPRESS_DB_NAME: db_wordpress
+           volumes:
+               - ./app:/var/www/html
+           ports:
+               - 9000:80
+           depends_on:
+               - database
+
+   wordpress-pma:
+           image: phpmyadmin/phpmyadmin
+           container_name: wordpress-pma
+           depends_on:
+               - database
+           environment:
+               - PMA_HOST=database
+               - PMA_PORT=3306
+               - PMA_ARBITRARY=1
+           ports:
+               - 8001:80
+           restart: always
+
+volumes:
+   bd-data:
