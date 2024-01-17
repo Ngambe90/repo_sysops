@@ -5,10 +5,13 @@ services:
            container_name: bd_wordpress
            restart: always
            environment:
-               MYSQL_ROOT_PASSWORD: mysql1234
+               MYSQL_ROOT_PASSWORD_FILE: /run/secrets/bd_root_password
                MYSQL_DATABASE: db_wordpress
                MYSQL_USER: user_wordpress
-               MYSQL_PASSWORD: Test@2024
+               MYSQL_PASSWORD_FILE: /run/secrets/bd_password
+            secrets:
+               - bd_root_password
+               - bd_password
            volumes:
                - bd-data:/var/lib/mysql
    wordpress:
@@ -18,8 +21,10 @@ services:
            environment:
                WORDPRESS_DB_HOST: database
                WORDPRESS_DB_USER: user_wordpress
-               WORDPRESS_DB_PASSWORD: Test@2024
+               WORDPRESS_DB_PASSWORD_FILE: /run/secrets/bd_password
                WORDPRESS_DB_NAME: db_wordpress
+           secrets:
+               -bd_password
            volumes:
                - ./web:/var/www/html
            ports:
@@ -39,6 +44,11 @@ services:
            ports:
                - 8001:80
            restart: always
+secrets:
+    bd_password:
+           file: bd_password.txt
+    bd_root_password:
+           file: bd_root_password.txt
 
 volumes:
    bd-data:
